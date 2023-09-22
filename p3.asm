@@ -1,3 +1,4 @@
+.RADIX 16
 .MODEL SMALL ;; Definicion del modelo de memoria
 ;; Definicion de segmentos
 .STACK 
@@ -15,8 +16,8 @@ continue DB 0AH, 0DH, "Presione 'Enter' para continuar...", 0AH, 0DH, "$"
 ;;---------------------------------Fin de Encabezado---------------------------------
 ;;---------------------------------Lectura-------------------------------------------
 filename DB "AYUDA.TXT", 0 ;; Nombre del archivo
-buffer DB 81 DUP (?) ;; Buffer de lectura
-buffer_size DW 81 ;; Tamaño del buffer
+buffer DB 51 DUP (?) ;; Buffer de lectura
+buffer_size DW 51 ;; Tamaño del buffer
 handle DW ? ;; Handle del archivo
 line_count DW 0 ;; Contador de lineas
 page_message DB 0AH, 0DH, "Presione 'n' para avanzar a la siguiente pagina o 'q' para salir...", 0AH, 0DH, "$" ;; Mensaje de pagina
@@ -111,7 +112,7 @@ COMPARAR_CARACTER:
     INC DI ;; Se incrementa el indice de los caracteres permitidos
     MOV AL, allowed_chars[DI] ;; Se obtiene el siguiente caracter permitido
     ;;si el DI es igual al tamaño de la cadena de caracteres permitidos, entonces la cadena es invalida
-    CMP DI, 100 ;; Se compara el indice de los caracteres permitidos con el tamaño de la cadena de caracteres permitidos
+    CMP DI, 64 ;; Se compara el indice de los caracteres permitidos con el tamaño de la cadena de caracteres permitidos
     JE CADENA_INVALIDA ;; Si son iguales, entonces la cadena es invalida
     JMP COMPARAR_CARACTER ;; Si no es el caracter nulo, entonces se vuelve a comparar el caracter con el caracter permitido
     ;JMP FIN_LECTURA ;; Si es el caracter nulo, entonces la cadena es invalida
@@ -133,7 +134,7 @@ CADENA_VALIDA:
     INT 21H ;; Interrupcion para mostrar cadena de caracteres
     ;;contar el numero de lineas
     INC line_count ;; Incrementa el contador de lineas
-    CMP line_count, 20 ;; Compara si el contador de lineas es igual a 20
+    CMP line_count, 14 ;; Compara si el contador de lineas es igual a 20
     JL LEER_ARCH ;; Si es menor o igual a 20, entonces vuelve a leer el archivo
     MOV line_count, 0 ;; Reinicia el contador de lineas
 RESPUESTA_ARCH:
