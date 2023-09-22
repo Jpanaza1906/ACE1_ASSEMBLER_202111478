@@ -1,0 +1,11 @@
+========================================================
+               Archivo de Ayuda - Mi Programa
+========================================================
+
+Bienvenido al archivo de ayuda de Mi Programa. 
+
+1. Introduccion
+2. Requisitos del Sistema
+3. Instalacion
+4. Inicio Rapido
+5. Funcionalidades Principales

@@ -1,0 +1,200 @@
+    MOV AH, 3DH ;; Funcion para abrir un archivo
+    MOV AL, 0 ;; Modo de apertura
+    MOV DX, OFFSET ARCHIVO ;; Direccion de memoria del nombre del archivo
+    INT 21 ;; Interrupcion para abrir un archivo
+    JC ERROR ;; Si no se pudo abrir el archivo, entonces va a la etiqueta ERROR
+    MOV HANDLE, AX ;; Guarda el handle del archivo
+    MOV AH, 3FH ;; Funcion para leer un archivo
+    MOV BX, HANDLE ;; Guarda el handle del archivo
+    MOV CX, 100 ;; Cantidad de bytes a leer
+    MOV DX, OFFSET BUFFER ;; Direccion de memoria del buffer
+    INT 21 ;; Interrupcion para leer un archivo
+    JC ERROR ;; Si no se pudo leer el archivo, entonces va a la etiqueta ERROR
+    MOV AH, 3EH ;; Funcion para cerrar un archivo
+    MOV BX, HANDLE ;; Guarda el handle del archivo
+    INT 21 ;; Interrupcion para cerrar un archivo
+    JC ERROR ;; Si no se pudo cerrar el archivo, entonces va a la etiqueta ERROR
+    MOV AH, 09 ;; Funcion para mostrar cadena de caracteres
+    MOV DX, OFFSET BUFFER ;; Direccion de memoria del buffer
+    INT 21 ;; Interrupcion para mostrar cadena de caracteres
+    JMP PAUSA ;; Salta a la etiqueta PAUSA
+
+MOV AH, 3DH ;; Funcion para abrir un archivo
+    MOV AL, 0 ;; Modo de apertura
+    MOV DX, OFFSET filename ;; Direccion de memoria del nombre del archivo
+    INT 21 ;; Interrupcion para abrir un archivo
+
+    JC OPEN_ERROR ;; Si existe un error al abrir el archivo, entonces salta a la etiqueta OPEN_ERROR
+
+    MOV handle, AX ;; Guarda el handle del archivo en la variable handle
+
+    MOV AH, 3EH ;; Funcion para cerrar un archivo
+    MOV BX, handle ;; Guarda el handle del archivo en BX
+    INT 21 ;; Interrupcion para cerrar un archivo
+    JMP ENCABEZADO ;; Salta a la etiqueta ENCABEZADO
+
+
+
+
+
+
+
+    LECTURA: ;; se lee un archivo de texto de 20 en 20 lineas, se presiona 'n' para avanzar y 'q' para finalizar la lectura
+    ;Abrir archivo
+    MOV AH, 3DH ;; Funcion para abrir un archivo
+    MOV DX, OFFSET filename ;; Direccion de memoria del nombre del archivo
+    MOV AL, 0 ;; Modo de apertura del archivo
+    INT 21 ;; Interrupcion para abrir un archivo
+    ;JC error_open ;; Si el handle es 0, entonces hubo un error al abrir el archivo
+    MOV bx, ax ;; Guarda el handle del archivo
+leer_arch:
+    ;leer archivo
+    MOV AH, 3FH ;; Funcion para leer un archivo
+    MOV CX, buffer_size ;; Tamaño del buffer
+    MOV DX, OFFSET buffer ;; Direccion de memoria del buffer
+    INT 21 ;; Interrupcion para leer un archivo
+    JC error_read ;; Si el handle es 0, entonces hubo un error al leer el archivo
+
+    ;mostrar archivo
+    MOV AH, 09 ;; Funcion para mostrar cadena de caracteres
+    MOV DX, OFFSET buffer ;; Direccion de memoria del buffer
+    INT 21 ;; Interrupcion para mostrar cadena de caracteres
+
+    ;contar lineas
+    INC line_count ;; Incrementa el contador de lineas
+    CMP line_count, 20 ;; Compara si el contador de lineas es igual a 20
+    JNE leer_arch ;; Si el contador de lineas es menor a 20, entonces vuelve a leer el archivo
+respuesta:
+    ;respuesta del usuario
+    MOV AH, 09 ;; Funcion para mostrar cadena de caracteres
+    MOV DX, OFFSET page_message ;; Direccion de memoria del mensaje de pagina
+    INT 21 ;; Interrupcion para mostrar cadena de caracteres
+    MOV AH, 01 ;; Funcion para leer un caracter
+    INT 21 ;; Interrupcion para leer un caracter
+    CMP AL, 'n' ;; Compara si el caracter es 'n'
+    JE sig_pag ;; Si el caracter es 'n', entonces vuelve a leer el archivo
+    CMP AL, 'q' ;; Compara si el caracter es 'q'
+    JE fin ;; Si el caracter es 'q', entonces finaliza el programa
+    JMP respuesta ;; Si el caracter no es 'n' ni 'q', entonces vuelve a pedir un caracter
+sig_pag:
+    ;siguiente pagina
+    MOV line_count, 0 ;; Reinicia el contador de lineas
+    INC page_count ;; Incrementa el contador de paginas
+    JMP leer_arch ;; Vuelve a leer el archivo
+error_open:
+    ;error al abrir el archivo
+    MOV AH, 09 ;; Funcion para mostrar cadena de caracteres
+    MOV DX, OFFSET open_error_message ;; Direccion de memoria del mensaje de error al abrir el archivo
+    INT 21 ;; Interrupcion para mostrar cadena de caracteres
+    JMP fin ;; Finaliza el programa
+error_read:
+    ;error al leer el archivo
+    MOV AH, 09 ;; Funcion para mostrar cadena de caracteres
+    MOV DX, OFFSET read_error_message ;; Direccion de memoria del mensaje de error al leer el archivo
+    INT 21 ;; Interrupcion para mostrar cadena de caracteres
+    JMP fin ;; Finaliza el programa
+;;---------------------------------Fin de Lectura---------------------------------
+fin:
+
+
+;;---------------------------------Lectura---------------------------------
+LECTURA:
+    ;Abrir archivo
+    MOV AH, 3DH ;; Funcion para abrir un archivo
+    MOV AL, 0 ;; Modo de apertura
+    MOV DX, OFFSET filename ;; Direccion de memoria del nombre del archivo
+    INT 21 ;; Interrupcion para abrir un archivo
+    JC OPEN_ERROR ;; Si existe un error, entonces salta a la etiqueta OPEN_ERROR
+    MOV handle, AX ;; Guarda el handle del archivo
+LEER_ARCHIVO:
+    ;Leer archivo
+    MOV AH, 3FH ;; Funcion para leer un archivo
+    MOV BX, handle ;; Handle del archivo
+    MOV CX, buffer_size ;; Tamaño del buffer
+    MOV DX, OFFSET buffer ;; Direccion de memoria del buffer
+    INT 21 ;; Interrupcion para leer un archivo
+    JC READ_ERROR ;; Si existe un error, entonces salta a la etiqueta READ_ERROR
+    
+    ;mostar archivo
+    MOV AH, 09 ;; Funcion para mostrar cadena de caracteres
+    MOV DX, OFFSET buffer ;; Direccion de memoria del buffer
+    INT 21 ;; Interrupcion para mostrar cadena de caracteres
+
+    ;Contar lineas
+    INC line_count ;; Incrementa el contador de lineas
+    CMP line_count, 20 ;; Compara si el contador de lineas es igual a 20
+    JLE LEER_ARCHIVO ;; Si es menor o igual a 20, entonces vuelve a leer el archivo
+RESPUESTALEC:
+    ;Preguntar si desea continuar
+    MOV AH, 09 ;; Funcion para mostrar cadena de caracteres
+    MOV DX, OFFSET page_message ;; Direccion de memoria del mensaje de pagina
+    INT 21 ;; Interrupcion para mostrar cadena de caracteres
+    MOV AH, 01 ;; Funcion para leer un caracter
+    INT 21 ;; Interrupcion para leer un caracter
+    CMP AL, 'n' ;; Compara si el caracter es una 'n'
+    JE SIG_PAG ;; Si es una 'n', entonces salta a la etiqueta SIG_PAG
+    CMP AL, 'q' ;; Compara si el caracter es una 'q'
+    JE FIN ;; Si es una 'q', entonces salta a la etiqueta FIN
+    JMP RESPUESTALEC ;; Si no es una 'n' ni una 'q', entonces vuelve a preguntar
+SIG_PAG:
+    ;siguiente pagina
+    MOV line_count, 0 ;; Reinicia el contador de lineas
+    INC page_count ;; Incrementa el contador de paginas
+    JMP LEER_ARCHIVO ;; Salta a la etiqueta LEER_ARCHIVO
+OPEN_ERROR:
+;;si existe un error en la apertura
+    MOV AH, 09 ;; Funcion para mostrar cadena de caracteres
+    MOV DX, OFFSET open_error_message ;; Direccion de memoria de la cadena de caracteres
+    INT 21 ;; Interrupcion para mostrar cadena de caracteres
+    JMP FIN ;; Salta a la etiqueta FIN
+READ_ERROR:
+;;si existe un error en la lectura
+    MOV AH, 09 ;; Funcion para mostrar cadena de caracteres
+    MOV DX, OFFSET read_error_message ;; Direccion de memoria de la cadena de caracteres
+    INT 21 ;; Interrupcion para mostrar cadena de caracteres
+    JMP FIN ;; Salta a la etiqueta FIN
+FIN:
+
+;;---------------------------------Lectura---------------------------------
+;Abrir archivo
+    MOV AH, 3DH ;; Funcion para abrir un archivo
+    MOV AL, 0 ;; Modo de apertura
+    MOV DX, OFFSET filename ;; Direccion de memoria del nombre del archivo
+    INT 21H ;; Interrupcion para abrir un archivo
+    JC OPEN_ERROR ;; Si hay error, entonces salta a la etiqueta OPEN_ERROR
+    MOV handle, AX ;; Guarda el handle del archivo
+;Leer archivo
+    MOV AH, 3FH ;; Funcion para leer un archivo
+    MOV BX, handle ;; Handle del archivo
+    MOV CX, buffer_size ;; Tamaño del buffer
+    MOV DX, OFFSET buffer ;; Direccion de memoria del buffer
+    INT 21H ;; Interrupcion para leer un archivo
+    JC READ_ERROR ;; Si hay error, entonces salta a la etiqueta READ_ERROR
+;Cerrar archivo
+    MOV AH, 3EH ;; Funcion para cerrar un archivo
+    MOV BX, handle ;; Handle del archivo
+    INT 21H ;; Interrupcion para cerrar un archivo
+;Mostrar archivo
+    ;;Agregarle $ al final del buffer
+    MOV SI, OFFSET buffer ;; Direccion de memoria del buffer
+    ADD SI, buffer_size ;; Suma el tamaño del buffer a la direccion de memoria del buffer
+    DEC SI ;; Decrementa la direccion de memoria del buffer
+    MOV AL, "$" ;; Caracter $
+    MOV [SI], AL ;; Guarda el caracter $ en la direccion de memoria del buffer
+    ;;Mostrar el buffer
+    MOV AH, 09H ;; Funcion para mostrar cadena de caracteres
+    MOV DX, OFFSET buffer ;; Direccion de memoria del buffer
+    INT 21H ;; Interrupcion para mostrar cadena de caracteres
+    JMP FIN ;; Salta a la etiqueta FIN
+OPEN_ERROR:
+    ;Error al abrir el archivo
+    MOV AH, 09H ;; Funcion para mostrar cadena de caracteres
+    MOV DX, OFFSET open_error_message ;; Direccion de memoria de la cadena de caracteres
+    INT 21H ;; Interrupcion para mostrar cadena de caracteres
+READ_ERROR:
+    ;Error al leer el archivo
+    MOV AH, 09H ;; Funcion para mostrar cadena de caracteres
+    MOV DX, OFFSET read_error_message ;; Direccion de memoria de la cadena de caracteres
+    INT 21H ;; Interrupcion para mostrar cadena de caracteres
+
+FIN:
