@@ -1,9 +1,9 @@
 ================================================================================
-               Archivo de Ayuda - Mi Programa                                   
+Archivo de Ayuda - Mi Programa                                                  
 ================================================================================
 Bienvenido al archivo de ayuda de Mi Programa. Aqui encontraras informacion util
 para utilizar todas las funciones y caracteristicas de nuestra aplicacion.      
-1. Introduccion /                                                               
+1. Introduccion                                                                 
 2. Requisitos del Sistema                                                       
 3. Instalacion                                                                  
 4. Inicio Rapido                                                                
@@ -126,8 +126,7 @@ estos pasos para instalar la aplicacion en tu computadora y comenzar a jugar en
 cuestion de minutos:                                                            
                                                                                 
 Paso 1: Descarga el Archivo de Instalacion                                      
-1. Visita nuestro sitio web oficial en [www.miprograma-connect4.com/download]   
-(https://www.miprograma-connect4.com/download) desde tu navegador web.          
+1. Visita nuestro sitio web oficial desde tu navegador web.          
                                                                                 
 2. En la pagina de descarga, encontraras el enlace para descargar el archivo de 
 instalacion de Mi Programa - Connect 4. Haz clic en el enlace para iniciar la   

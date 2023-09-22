@@ -22,9 +22,8 @@ line_count DW 0 ;; Contador de lineas
 page_message DB 0AH, 0DH, "Presione 'n' para avanzar a la siguiente pagina o 'q' para salir...", 0AH, 0DH, "$" ;; Mensaje de pagina
 open_error_message DB 0AH, 0DH, "Error al abrir el archivo", 0AH, 0DH, "$" ;; Mensaje de error al abrir el archivo
 read_error_message DB 0AH, 0DH, "Error al leer el archivo", 0AH, 0DH, "$" ;; Mensaje de error al leer el archivo
-allowed_chars db "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789.,;:!?()[]{}<>\n\r", 0
-cadenaValida DB "La cadena contiene solo caracteres permitidos.", 0AH, 0DH, "$"
-cadenaInvalida DB "La cadena contiene caracteres no permitidos.", 0AH, 0DH, "$"
+allowed_chars db "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789 $.,;:!?()[]{}<>-=\n\r\t", 0AH, 0DH, "$"
+cadenaInvalida DB 0AH, 0DH, "La cadena contiene caracteres no permitidos.", 0AH, 0DH, "$"
 ;;---------------------------------Fin de Lectura-------------------------------------
 
 
@@ -91,7 +90,7 @@ LEER_ARCH:
     MOV SI, OFFSET buffer ;; Direccion de memoria del buffer
     ADD SI, buffer_size ;; Suma el tamaño del buffer a la direccion de memoria del buffer
     DEC SI ;; Decrementa la direccion de memoria del buffer
-    MOV AL, "$" ;; Caracter $
+    MOV AL, '$' ;; Caracter $
     MOV [SI], AL ;; Guarda el caracter $ en la direccion de memoria del buffer
 ;;Se verifica si la cadena contiene solo caracteres permitidos
     MOV SI, 0 ;; Se inicializa el indice de la cadena
@@ -99,8 +98,8 @@ LEER_ARCH:
     MOV AL, buffer[SI] ;; Se obtiene el primer caracter de la cadena
 ;Se recorre la cadena caracter por caracter
 LOOP_VERIFICAR:
-    CMP AL, 0 ;; Se verifica si el caracter es el caracter nulo
-    JE CADENA_VALIDA ;; Si es el caracter nulo, entonces la cadena es valida
+    ;CMP AL, 0 ;; Se verifica si el caracter es el caracter nulo
+    ;JE CADENA_VALIDA ;; Si es el caracter nulo, entonces la cadena es valida
 
     ;verificar si el caracter es permitido
     MOV DI, 0 ;; Se inicializa el indice de los caracteres permitidos
@@ -111,15 +110,21 @@ COMPARAR_CARACTER:
     JE CARACTER_PERMITIDO ;; Si son iguales, entonces el caracter es permitido
     INC DI ;; Se incrementa el indice de los caracteres permitidos
     MOV AL, allowed_chars[DI] ;; Se obtiene el siguiente caracter permitido
-    CMP AL, 0 ;; Se verifica si el caracter es el caracter nulo
-    JNE COMPARAR_CARACTER ;; Si no es el caracter nulo, entonces se vuelve a comparar el caracter con el caracter permitido
-
-    JMP CADENA_VALIDA ;; Si no es el caracter nulo, entonces la cadena es valida
+    ;;si el DI es igual al tamaño de la cadena de caracteres permitidos, entonces la cadena es invalida
+    CMP DI, 100 ;; Se compara el indice de los caracteres permitidos con el tamaño de la cadena de caracteres permitidos
+    JE CADENA_INVALIDA ;; Si son iguales, entonces la cadena es invalida
+    JMP COMPARAR_CARACTER ;; Si no es el caracter nulo, entonces se vuelve a comparar el caracter con el caracter permitido
+    ;JMP FIN_LECTURA ;; Si es el caracter nulo, entonces la cadena es invalida
+    ;JMP CADENA_INVALIDA ;; Si es el caracter nulo, entonces la cadena es invalida
+    ;JMP CADENA_VALIDA ;; Si no es el caracter nulo, entonces la cadena es valida
 
 CARACTER_PERMITIDO:
     INC SI ;; Se incrementa el indice de la cadena
     MOV AL, buffer[SI] ;; Se obtiene el siguiente caracter de la cadena
     INC CX ;; Se incrementa el contador de caracteres permitidos
+    ;;Si el contador SI es igual al tamaño del buffer, entonces la cadena es valida
+    CMP CX, buffer_size ;; Se compara el contador de caracteres permitidos con el tamaño del buffer
+    JE CADENA_VALIDA ;; Si son iguales, entonces la cadena es valida
     JMP LOOP_VERIFICAR ;; Se vuelve a verificar el siguiente caracter de la cadena
 CADENA_VALIDA:
     ;;Mostrar el buffer
@@ -166,5 +171,7 @@ FIN_LECTURA:
     MOV AH, 3EH ;; Funcion para cerrar un archivo
     MOV BX, handle ;; Handle del archivo
     INT 21H ;; Interrupcion para cerrar un archivo
+;;---------------------------------Fin de Lectura---------------------------------
+
 .EXIT ;; Fin de programa
 END ;; Fin de programa
